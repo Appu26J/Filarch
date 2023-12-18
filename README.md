@@ -20,3 +20,5 @@ System.out.println("Took " + ((System.currentTimeMillis() - time) / 1000) + "s")
 
 *There's also a method called ```Filarch.searchFilesByNameAsync``` for asynchronized file searching, which is useful if you want live results.*
 
+### Library Download
+https://github.com/Appu26J/Filarch/releases/download/Filarch/filarch.jar
