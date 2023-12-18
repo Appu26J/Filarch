@@ -1,4 +1,5 @@
-# Filarch
+<img width="360" alt="image" src="https://github.com/Appu26J/Filarch/assets/128838345/b6c8ff37-fb4d-4d6d-8172-448cd448dfd0">
+
 A library for searching files very fast in Java.  
 This can search the entire C drive **FIVE** times faster than File Explorer does!
 
