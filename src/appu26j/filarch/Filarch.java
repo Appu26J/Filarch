@@ -145,7 +145,7 @@ public class Filarch
             thread.start();
         }
 
-        public static boolean haveFinished()
+        public static boolean hasFinished()
         {
             boolean done = true;
 
@@ -182,7 +182,7 @@ public class Filarch
 
         public boolean isSearching()
         {
-            return !Threads.haveFinished();
+            return !Threads.hasFinished();
         }
 
         @Override
