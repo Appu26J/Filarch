@@ -19,7 +19,7 @@ System.out.println("\n" + count + " total files found containing the letter a");
 System.out.println("Took " + ((System.currentTimeMillis() - time) / 1000) + "s");
 ```
 
-*There's also a method called ```Filarch.searchFilesByNameAsync``` for asynchronized file searching (without blocking the current thread), which is useful if you want live results.*
+*There's also a method called ```Filarch.searchFilesByNameAsync``` for asynchronized file searching* **(without blocking the current thread)***, which is useful if you want live results.*
 
 ### Library Download
 https://github.com/Appu26J/Filarch/releases/download/Filarch/filarch.jar
