@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="filarch:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Filarch</output-path>
+    <root id="archive" name="filarch.jar">
+      <element id="module-output" name="Filarch" />
+    </root>
+  </artifact>
+</component>

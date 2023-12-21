@@ -1,6 +1,8 @@
 package appu26j.filarch;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,6 +17,11 @@ public class Filarch
         return searchFilesByName("", searchOptions);
     }
 
+    public static Result searchFilesAsync(SearchOptions searchOptions)
+    {
+        return searchFilesByNameAsync("", searchOptions);
+    }
+
     public static Result searchFilesByName(String name, SearchOptions searchOptions)
     {
         Result result = searchFilesByNameAsync(name, searchOptions);
@@ -25,11 +32,6 @@ public class Filarch
         }
 
         return result;
-    }
-
-    public static Result searchFilesAsync(SearchOptions searchOptions)
-    {
-        return searchFilesByNameAsync("", searchOptions);
     }
 
     public static Result searchFilesByNameAsync(String name, SearchOptions searchOptions)
@@ -51,11 +53,46 @@ public class Filarch
 
         Result result = new Result();
         tempObjects.put(searchOptions.code(), result);
-        search(searchOptions.getParent(), name, searchOptions.isIgnoreCase(), searchOptions.searchHiddenFiles(), searchOptions.getSearchMode(), searchOptions.code());
+        searchName(searchOptions.getParent(), name, searchOptions.isIgnoreCase(), searchOptions.searchHiddenFiles(), searchOptions.getSearchMode(), searchOptions.code());
         return result;
     }
 
-    private static void search(File file, String name, boolean ignoreCase, boolean hiddenFiles, SearchMode searchMode, int code)
+    public static Result searchFilesByContent(String content, SearchOptions searchOptions)
+    {
+        Result result = searchFilesByContentAsync(content, searchOptions);
+
+        while (result.isSearching())
+        {
+            ;
+        }
+
+        return result;
+    }
+
+    public static Result searchFilesByContentAsync(String content, SearchOptions searchOptions)
+    {
+        if (tempObjects.containsKey(searchOptions.code()))
+        {
+            Result result = tempObjects.get(searchOptions.code());
+
+            if (result.isSearching())
+            {
+                return result;
+            }
+
+            else
+            {
+                tempObjects.remove(searchOptions.code());
+            }
+        }
+
+        Result result = new Result();
+        tempObjects.put(searchOptions.code(), result);
+        searchContent(searchOptions.getParent(), content, searchOptions.isIgnoreCase(), searchOptions.searchHiddenFiles(), searchOptions.getSearchMode(), searchOptions.code());
+        return result;
+    }
+
+    private static void searchName(File file, String name, boolean ignoreCase, boolean hiddenFiles, SearchMode searchMode, int code)
     {
         if (!hiddenFiles && !file.getName().isEmpty() && file.isHidden())
         {
@@ -70,7 +107,7 @@ public class Filarch
                 {
                     for (File f : Objects.requireNonNull(file.listFiles()))
                     {
-                        search(f, name, ignoreCase, hiddenFiles, searchMode, code);
+                        searchName(f, name, ignoreCase, hiddenFiles, searchMode, code);
                     }
                 }
 
@@ -120,6 +157,111 @@ public class Filarch
                         if (fileName.endsWith(finalStartsWith))
                         {
                             tempObjects.get(code).addFile(file);
+                        }
+
+                        break;
+                    }
+                }
+            }
+
+            catch (Exception e)
+            {
+                ;
+            }
+        }
+    }
+
+    private static void searchContent(File file, String content, boolean ignoreCase, boolean hiddenFiles, SearchMode searchMode, int code)
+    {
+        if (!hiddenFiles && !file.getName().isEmpty() && file.isHidden())
+        {
+            return;
+        }
+
+        if (file.isDirectory() && file.listFiles() != null)
+        {
+            Threads.addThread(() ->
+            {
+                try
+                {
+                    for (File f : Objects.requireNonNull(file.listFiles()))
+                    {
+                        searchContent(f, content, ignoreCase, hiddenFiles, searchMode, code);
+                    }
+                }
+
+                catch (Exception e)
+                {
+                    ;
+                }
+            });
+        }
+
+        else
+        {
+            try (FileReader fileReader = new FileReader(file); BufferedReader bufferedReader = new BufferedReader(fileReader))
+            {
+                String line, finalContent = content;
+
+                if (ignoreCase)
+                {
+                    finalContent = finalContent.toLowerCase();
+                }
+
+                switch (searchMode)
+                {
+                    case STARTS_WITH:
+                    {
+                        while ((line = bufferedReader.readLine()) != null)
+                        {
+                            if (ignoreCase)
+                            {
+                                line = line.toLowerCase();
+                            }
+
+                            if (line.startsWith(finalContent))
+                            {
+                                tempObjects.get(code).addFile(file);
+                                break;
+                            }
+                        }
+
+                        break;
+                    }
+
+                    case CONTAINS:
+                    {
+                        while ((line = bufferedReader.readLine()) != null)
+                        {
+                            if (ignoreCase)
+                            {
+                                line = line.toLowerCase();
+                            }
+
+                            if (line.contains(finalContent))
+                            {
+                                tempObjects.get(code).addFile(file);
+                                break;
+                            }
+                        }
+
+                        break;
+                    }
+
+                    case ENDS_WITH:
+                    {
+                        while ((line = bufferedReader.readLine()) != null)
+                        {
+                            if (ignoreCase)
+                            {
+                                line = line.toLowerCase();
+                            }
+
+                            if (line.endsWith(finalContent))
+                            {
+                                tempObjects.get(code).addFile(file);
+                                break;
+                            }
                         }
 
                         break;
